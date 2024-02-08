@@ -41,7 +41,7 @@ public class EmployeeControllerTest {
     }
 
     @Test
-    public void testReportingStructure() {
+    public void testReportingStructure1() {
 
         Employee employee = employeeController.read("16a596ae-edd3-4847-99fe-c4518e82c86f");
 
@@ -58,6 +58,48 @@ public class EmployeeControllerTest {
         assertNotNull(reportingStructure.getEmployee());
 
         assertEquals(4, reportingStructure.getNumberOfReports());
+
+    }
+
+    @Test
+    public void testReportingStructure2() {
+
+        Employee employee = employeeController.read("b7839309-3348-463b-a7e3-5de1c168beb3");
+
+        assertNotNull(employee);
+        assertNotNull(employee.getEmployeeId());
+        assertEquals("Paul", employee.getFirstName());
+        assertEquals("McCartney", employee.getLastName());
+        assertEquals("Developer I", employee.getPosition());
+        assertEquals("Engineering", employee.getDepartment());
+
+        ReportingStructure reportingStructure = restTemplate.getForEntity(reportStructureUrl, ReportingStructure.class, employee.getEmployeeId()).getBody();
+
+        assertNotNull(reportingStructure);
+        assertNotNull(reportingStructure.getEmployee());
+
+        assertEquals(0, reportingStructure.getNumberOfReports());
+
+    }
+
+    @Test
+    public void testReportingStructure3() {
+
+        Employee employee = employeeController.read("03aa1462-ffa9-4978-901b-7c001562cf6f");
+
+        assertNotNull(employee);
+        assertNotNull(employee.getEmployeeId());
+        assertEquals("Ringo", employee.getFirstName());
+        assertEquals("Starr", employee.getLastName());
+        assertEquals("Developer V", employee.getPosition());
+        assertEquals("Engineering", employee.getDepartment());
+
+        ReportingStructure reportingStructure = restTemplate.getForEntity(reportStructureUrl, ReportingStructure.class, employee.getEmployeeId()).getBody();
+
+        assertNotNull(reportingStructure);
+        assertNotNull(reportingStructure.getEmployee());
+
+        assertEquals(2, reportingStructure.getNumberOfReports());
 
     }
 
