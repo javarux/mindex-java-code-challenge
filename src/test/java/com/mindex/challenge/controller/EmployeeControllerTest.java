@@ -32,12 +32,14 @@ public class EmployeeControllerTest {
     private int port;
 
     private String reportStructureUrl;
-    private String compensationUrl;
+    private String compensationReadUrl;
+    private String compensationCreateUrl;
 
     @Before
     public void setup() {
         reportStructureUrl = "http://localhost:" + port + "/employee/{id}/reports";
-        compensationUrl = "http://localhost:" + port + "/employee/{id}/compensation";
+        compensationReadUrl = "http://localhost:" + port + "/employee/{id}/compensation";
+        compensationCreateUrl = "http://localhost:" + port + "/employee/compensation";
     }
 
     @Test
@@ -121,7 +123,7 @@ public class EmployeeControllerTest {
         compensation.setEffectiveDate(new Date());
 
         // Create checks
-        Compensation createdCompensation = restTemplate.postForEntity(compensationUrl, compensation, Compensation.class, employee.getEmployeeId()).getBody();
+        Compensation createdCompensation = restTemplate.postForEntity(compensationCreateUrl, compensation, Compensation.class).getBody();
 
         assertNotNull(createdCompensation);
         assertNotNull(createdCompensation.getEmployee());
@@ -133,7 +135,7 @@ public class EmployeeControllerTest {
         assertCompensationEquivalence(compensation, createdCompensation);
 
         // Read checks
-        Compensation readCompensation = restTemplate.getForEntity(compensationUrl, Compensation.class, employee.getEmployeeId()).getBody();
+        Compensation readCompensation = restTemplate.getForEntity(compensationReadUrl, Compensation.class, employee.getEmployeeId()).getBody();
 
         assertNotNull(readCompensation);
         assertNotNull(readCompensation.getEmployee());

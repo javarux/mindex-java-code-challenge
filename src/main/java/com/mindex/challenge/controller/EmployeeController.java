@@ -20,9 +20,13 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
-    @PostMapping("/employee/{employeeId}/compensation")
-    public Compensation create(@PathVariable String employeeId, @RequestBody Compensation compensation) {
-        LOG.debug("Received compensation create request for Employee ID [{}] and compensation [{}]", employeeId, compensation);
+    @PostMapping("/employee/compensation")
+    public Compensation create(@RequestBody Compensation compensation) {
+        LOG.debug("Received compensation create request for compensation [{}]", compensation);
+
+        if (compensation.getEmployee() == null) {
+            throw new RuntimeException("Employee instance is required");
+        }
 
         return employeeService.create(compensation);
     }
