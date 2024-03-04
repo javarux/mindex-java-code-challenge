@@ -2,23 +2,21 @@ package com.mindex.challenge.service.impl;
 
 import com.mindex.challenge.data.Employee;
 import com.mindex.challenge.service.EmployeeService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EmployeeServiceImplTest {
 
@@ -34,7 +32,7 @@ public class EmployeeServiceImplTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Before
+    @BeforeEach
     public void setup() {
         employeeUrl = "http://localhost:" + port + "/employee";
         employeeIdUrl = "http://localhost:" + port + "/employee/{id}";
@@ -57,6 +55,7 @@ public class EmployeeServiceImplTest {
 
         // Read checks
         Employee readEmployee = restTemplate.getForEntity(employeeIdUrl, Employee.class, createdEmployee.getEmployeeId()).getBody();
+
         assertEquals(createdEmployee.getEmployeeId(), readEmployee.getEmployeeId());
         assertEmployeeEquivalence(createdEmployee, readEmployee);
 

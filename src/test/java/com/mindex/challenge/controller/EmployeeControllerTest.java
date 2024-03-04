@@ -3,22 +3,19 @@ package com.mindex.challenge.controller;
 import com.mindex.challenge.data.Compensation;
 import com.mindex.challenge.data.Employee;
 import com.mindex.challenge.data.ReportingStructure;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EmployeeControllerTest {
 
@@ -35,7 +32,7 @@ public class EmployeeControllerTest {
     private String compensationReadUrl;
     private String compensationCreateUrl;
 
-    @Before
+    @BeforeEach
     public void setup() {
         reportStructureUrl = "http://localhost:" + port + "/employee/{id}/reports";
         compensationReadUrl = "http://localhost:" + port + "/employee/{id}/compensation";
