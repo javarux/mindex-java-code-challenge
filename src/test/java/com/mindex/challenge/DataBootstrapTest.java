@@ -471,5 +471,30 @@ Guaranteed constraints:
         return count;
     }
 
+    // B-tree search
+
+    private static final int MAX_KEYS = 5;
+
+    private static class Node {
+        int n;
+        int[] key = new int[MAX_KEYS];
+        Node[] child = new Node[MAX_KEYS+1];
+        boolean leaf;
+    }
+
+    private Node bTreeSearch(Node x, int k) {
+        int i = 0;
+        while (i < x.n && k >= x.key[i]) {
+            i++;
+        }
+        if (i < x.n && k == x.key[i]) {
+            return x;
+        }
+        if (x.leaf) {
+            return null;
+        }
+        return bTreeSearch(x.child[i], k);
+    }
+
 
 }
