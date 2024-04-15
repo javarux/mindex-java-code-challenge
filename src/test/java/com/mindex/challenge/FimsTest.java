@@ -51,7 +51,7 @@ public class FimsTest {
                        order by prop_seq_no
                 """;
 
-        StringBuilder builder = new StringBuilder("PROP_SEQ_NO,LAT,LON,BOUNDING_BOX\n");
+        StringBuilder builder = new StringBuilder("PROP_SEQ_NO,LAT,LON,BOUNDING_BOX,API_URL\n");
 
         jdbcTemplate.query(sql, rs -> {
 
@@ -89,7 +89,7 @@ public class FimsTest {
                     boolean triedZipCodeOnly = false;
 
                     if (streetExists && zipCodeExists) {
-                        if ( !street.startsWith(zipCode)) {
+                        if (!street.startsWith(zipCode)) {
                             url = String.format(url + "&street=%s&postalcode=%s", street, zipCode);
                         } else {
                             url = String.format(url + "&postalcode=%s", zipCode);
@@ -129,7 +129,9 @@ public class FimsTest {
                         builder.append(map.get("lon"));
                         builder.append(",\"");
                         builder.append(map.get("boundingbox"));
-                        builder.append("\"\n");
+                        builder.append("\",");
+                        builder.append(url);
+                        builder.append("\n");
                     }
 
                 }
@@ -140,7 +142,7 @@ public class FimsTest {
 
         });
 
-        Files.write(Paths.get("/home/mike/tmp/coord_4.csv"),
+        Files.write(Paths.get("/home/mike/tmp/coord_5.csv"),
                 (builder + "\n").getBytes(),
                 StandardOpenOption.CREATE,
                 StandardOpenOption.TRUNCATE_EXISTING);
