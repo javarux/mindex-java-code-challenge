@@ -32,6 +32,9 @@ public class FimsTest {
     @Autowired
     private RestTemplate restTemplate;
 
+    private record Result(String url, String lat, String lon) {
+    }
+
     @Test
     public void getCoordinates() throws Exception {
 
@@ -51,7 +54,9 @@ public class FimsTest {
                        order by prop_seq_no
                 """;
 
-        StringBuilder builder = new StringBuilder("PROP_SEQ_NO,LAT,LON,BOUNDING_BOX,API_URL\n");
+        StringBuilder builder = new StringBuilder("PROP_SEQ_NO,LAT,LON,API_URL\n");
+
+        Map<String, Result> resultMap = new HashMap<>(5000);
 
         jdbcTemplate.query(sql, rs -> {
 
@@ -73,6 +78,24 @@ public class FimsTest {
 
                     log.info(propSeqNo + ", street: " + street + ", zip: " + zipCode + ", state: " + state + ", city: " + city + ", county: " + county);
 
+                    String resultMapKey = street + ":" + city + ":" + state + ":" + zipCode;
+
+                    if (resultMap.containsKey(resultMapKey)) {
+
+                        Result result = resultMap.get(resultMapKey);
+
+                        builder.append(propSeqNo);
+                        builder.append(",");
+                        builder.append(result.lat);
+                        builder.append(",");
+                        builder.append(result.lon);
+                        builder.append(",");
+                        builder.append(result.url);
+                        builder.append("\n");
+
+                        return;
+                    }
+
                     if (streetExists) {
                         street = street.replace("#", "");
                     }
@@ -88,15 +111,15 @@ public class FimsTest {
 
                     boolean triedZipCodeOnly = false;
 
-                    if (streetExists && zipCodeExists) {
+                    if (streetExists && zipCodeExists && stateExists) {
                         if (!street.startsWith(zipCode)) {
-                            url = String.format(url + "&street=%s&postalcode=%s", street, zipCode);
+                            url = String.format(url + "&street=%s&postalcode=%s&state=%s", street, zipCode, state);
                         } else {
                             url = String.format(url + "&postalcode=%s", zipCode);
                             triedZipCodeOnly = true;
                         }
-                    } else if (streetExists) {
-                        url = String.format(url + "&street=%s", street);
+                    } else if (streetExists && stateExists) {
+                        url = String.format(url + "&street=%s&state=%s", street, state);
                     } else if (zipCodeExists) {
                         url = String.format(url + "&postalcode=%s", zipCode);
                         triedZipCodeOnly = true;
@@ -122,16 +145,19 @@ public class FimsTest {
 
                         Map<?, ?> map = (Map<?, ?>) results.get(0);
 
+                        String lat = (String) map.get("lat");
+                        String lon = (String) map.get("lon");
+
                         builder.append(propSeqNo);
                         builder.append(",");
-                        builder.append(map.get("lat"));
+                        builder.append(lat);
                         builder.append(",");
-                        builder.append(map.get("lon"));
-                        builder.append(",\"");
-                        builder.append(map.get("boundingbox"));
-                        builder.append("\",");
+                        builder.append(lon);
+                        builder.append(",");
                         builder.append(url);
                         builder.append("\n");
+
+                        resultMap.put(resultMapKey, new Result(url, lat, lon));
                     }
 
                 }
@@ -142,7 +168,7 @@ public class FimsTest {
 
         });
 
-        Files.write(Paths.get("/home/mike/tmp/coord_5.csv"),
+        Files.write(Paths.get("/home/mike/tmp/coord_7.csv"),
                 (builder + "\n").getBytes(),
                 StandardOpenOption.CREATE,
                 StandardOpenOption.TRUNCATE_EXISTING);
