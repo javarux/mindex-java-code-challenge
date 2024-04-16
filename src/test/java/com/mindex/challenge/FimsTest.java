@@ -107,7 +107,7 @@ public class FimsTest {
                         }
                     }
 
-                    String url = "https://nominatim.openstreetmap.org/search?format=json&country=US";
+                    String url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1&country=US";
 
                     boolean triedZipCodeOnly = false;
 
@@ -130,7 +130,7 @@ public class FimsTest {
                     List<?> results = restTemplate.getForObject(url, List.class);
 
                     if (CollectionUtils.isEmpty(results) && (zipCodeExists || (cityExists && stateExists))) {
-                        url = "https://nominatim.openstreetmap.org/search?format=json&country=US";
+                        url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1&country=US";
                         if (!triedZipCodeOnly && zipCodeExists) {
                             url = String.format(url + "&postalcode=%s", zipCode);
                             results = restTemplate.getForObject(url, List.class);
@@ -144,20 +144,33 @@ public class FimsTest {
                     if (!CollectionUtils.isEmpty(results)) {
 
                         Map<?, ?> map = (Map<?, ?>) results.get(0);
+                        Map<?, ?> address = (Map<?, ?>) map.get("address");
 
-                        String lat = (String) map.get("lat");
-                        String lon = (String) map.get("lon");
+                        String postcode = (String) address.get("postcode");
+                        String isoState = (String) address.get("ISO3166-2-lvl4");
 
-                        builder.append(propSeqNo);
-                        builder.append(",");
-                        builder.append(lat);
-                        builder.append(",");
-                        builder.append(lon);
-                        builder.append(",");
-                        builder.append(url);
-                        builder.append("\n");
+                        if (zipCodeExists && ((StringUtils.isNotBlank(postcode) && !zipCode.equals(postcode)) || (StringUtils.isNotBlank(isoState) && !isoState.endsWith(state)))) {
+                            url = String.format("https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1&country=US&postalcode=%s", zipCode);
+                            results = restTemplate.getForObject(url, List.class);
+                            map = !CollectionUtils.isEmpty(results) ? (Map<?, ?>) results.get(0) : null;
+                        }
 
-                        resultMap.put(resultMapKey, new Result(url, lat, lon));
+                        if (map != null) {
+
+                            String lat = (String) map.get("lat");
+                            String lon = (String) map.get("lon");
+
+                            builder.append(propSeqNo);
+                            builder.append(",");
+                            builder.append(lat);
+                            builder.append(",");
+                            builder.append(lon);
+                            builder.append(",");
+                            builder.append(url);
+                            builder.append("\n");
+
+                            resultMap.put(resultMapKey, new Result(url, lat, lon));
+                        }
                     }
 
                 }
